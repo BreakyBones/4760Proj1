@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
         char* args[] = {"./user", "Hello",
                         "there", "exec", "is", "neat", 0};
 //execvp(args[0], args);
-        execlp(args[0],args[0],args[1],args[2],args[3],args[4],args[5],args[6]);
+        execlp(args[0],args[0],args[1],args[2],args[3],args[4],args[5],args[6] , NULL);
         fprintf(stderr,"Exec failed, terminating\n");
         exit(1);
     } else {
