@@ -1,7 +1,7 @@
 CC	= gcc -g3
 CFLAGS  = -g3
-TARGET1 = child
-TARGET2 = parent 
+TARGET1 = user
+TARGET2 = oss
 
 OBJS1	= oss.c
 OBJS2	= user.c
@@ -14,11 +14,11 @@ $(TARGET1):	$(OBJS1)
 $(TARGET2):	$(OBJS2)
 	$(CC) -o $(TARGET2) $(OBJS2)
 
-child.o:	child.c
-	$(CC) $(CFLAGS) -c child.c 
+user.o:	user.c
+	$(CC) $(CFLAGS) -c user.c 
 
-parent.o:	parent.c
-	$(CC) $(CFLAGS) -c parent.c
+oss.o:	oss.c
+	$(CC) $(CFLAGS) -c oss.c
 
 clean:
 	/bin/rm -f *.o $(TARGET1) $(TARGET2)
