@@ -1,6 +1,6 @@
 #include<unistd.h>
 #include<sys/types.h>
-#include<sys/wait.h>
+#include<sys/wait.h> // forgot this
 #include<stdio.h>
 #include<stdlib.h>
 int main(int argc, char** argv) {
