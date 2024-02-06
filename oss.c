@@ -33,15 +33,12 @@ int main(int argc, char **argv) {
                 return (EXIT_SUCCESS);
             case 'n':
                 arg_n = atoi(optarg);
-                printf("n command is working: %d\n", arg_n);
                 break;
             case 's':
                 arg_s = atoi(optarg);
-                printf("s command is working: %d\n", arg_s);
                 break;
             case 't':
                 arg_t = optarg;
-                printf("t command is working: %d\n", arg_t);
                 break;
             case '?':
                 print_usage(argv[0]);
