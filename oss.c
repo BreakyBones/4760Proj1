@@ -4,6 +4,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+// This is the help program that shows when the user ask for the -h command
 void print_usage(const char *progName) {
     printf("Usage for %s: -n <n_value> -s <s_value> -t <t_value>\n" , progName);
     printf("Options:\n");
@@ -14,12 +15,16 @@ void print_usage(const char *progName) {
 
 
 int main(int argc, char** argv) {
-const char optstr[] = "hn:s:t:";
-char opt;
-int arg_n = 0;
-int arg_s = 0;
-int arg_t = 0;
+    // This is the params for the getopt
+    const char optstr[] = "hn:s:t:";
+    char opt;
 
+    // This is the actual variable for the arguments to use later on
+    int arg_n = 0;
+    int arg_s = 0;
+    int arg_t = 0;
+
+    // Get your arguments with getopt, save them to their respective variables, they will be used to check if all required variables are filled later
     while ( ( opt = getopt(argc , argv,  optstr) ) != -1) {
 
         switch (opt) {
