@@ -6,7 +6,7 @@
 
 // This is the help program that shows when the user ask for the -h command
 void print_usage(const char *progName) {
-    printf("Usage for %s: -n <n_value> -s <s_value> -t <t_value>\n" , progName);
+    printf("Usage for %s: -n <n_value> -s <s_value> -t <t_value>\n", progName);
     printf("Options:\n");
     printf("-n: stands for the total number of users to launch\n");
     printf("-s: Defines how many users are allowed to run simultaneously\n");
@@ -14,42 +14,42 @@ void print_usage(const char *progName) {
 }
 
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     // This is the params for the getopt
     const char optstr[] = "hn:s:t:";
     char opt;
-
+    pid_t cPid;
     // This is the actual variable for the arguments to use later on
     int arg_n = 0;
     int arg_s = 0;
     int arg_t = 0;
 
     // Get your arguments with getopt, save them to their respective variables, they will be used to check if all required variables are filled later
-    while ( ( opt = getopt(argc , argv,  optstr) ) != -1) {
+    while ((opt = getopt(argc, argv, optstr)) != -1) {
 
         switch (opt) {
             case 'h':
-                print_usage (argv[0]);
+                print_usage(argv[0]);
                 return (EXIT_SUCCESS);
             case 'n':
                 arg_n = atoi(optarg);
-                printf("n command is working: %d\n" , arg_n);
+                printf("n command is working: %d\n", arg_n);
                 break;
             case 's':
                 arg_s = atoi(optarg);
-                printf("s command is working: %d\n" , arg_s);
+                printf("s command is working: %d\n", arg_s);
                 break;
             case 't':
                 arg_t = atoi(optarg);
-                printf("t command is working: %d\n" , arg_t);
+                printf("t command is working: %d\n", arg_t);
                 break;
             case '?':
                 print_usage(argv[0]);
                 break;
             default: /* '?' */
-                printf("Invalid option %c\n" , optopt);
+                printf("Invalid option %c\n", optopt);
                 print_usage(argv[0]);
-                return(EXIT_FAILURE);
+                return (EXIT_FAILURE);
         }
 
     }
@@ -61,42 +61,49 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    for (int i = 0; i < arg_n; i++) {
-        if (arg_s > 0 && i % arg_s == 0) { // If the number of processes is equal to the number of active ppid
-            // Wait to launch the next user
+    int activeChild = 0;
+
+    // Launch User Processes
+    for (int i; i < arg_n; ++i) {
+        if (activeChild >= arg_s) {
             int status;
-            pid_t cPid = waitpid(-1 &status, 0);
-            if (cPid == -1) {
-                perror("Error in waitpid");
-                return(EXIT_FAILURE);
-            }
-            printf("Child with PID:%d exited successfully\n" , cPid);
-        }
-        pid_t pid = fork();
+            pid_t childPid = waitpid(-1, &status, WNOHANG);
 
-        if (pid == -1) {
-            perror("Error in forking user process");
-            return(EXIT_FAILURE);
-        }
+            while (childPid > 0) {
+                printf("Parent process (oss): Child process with PID %d exited with status %d\n" , childPid , WEXITSTATUS(status));
+                activeChild--;
 
-        if (pid == 0) {
-            // User process launch
-            execl("./user" , "user" , "-t" , arg_t, 0);
-            perror("Error in execl");
-            return(EXIT_FAILURE);
-        }
-        // Wait for the remaining child processes to finish
-        int status;
-        for (int i = 0; i < arg_n % arg_s; ++i) {
-            pid_t cPid = waitpid(-1, &status, 0);
-            if (cPid == -1) {
-                perror("error in waitpid");
-                return(EXIT_FAILURE);
+                childPid  = waitpid(-1, &status, WNOHANG);
             }
         }
-        printf("Child with PID:%d exited successfully\n");
+    }
+
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("Error in forking user process");
+        return (EXIT_FAILURE);
+    }
+
+    if (pid == 0) {
+        // User process launch
+        execl("./user", "user", "-t", arg_t, 0);
+        perror("Error in execl");
+        return (EXIT_FAILURE);
+    } else {
+        activeChild++;
+    }
+    // Wait for the remaining child processes to finish
+    int status;
+    pid_t childPid;
+    while ((childPid = waitpid(-1, &status, WNOHANG)) > 0) {
+        printf("Parent process (oss): Child process with PID %d exited with status %d\n", childPid , WEXITSTATUS(status));
+        activeChild--;
     }
 
     return EXIT_SUCCESS;
 }
+
+
+
 
