@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     if (pid == 0) {
         // User process launch
-        execl("./user", "user", "-t", arg_t, 0);
+        execl("./user", "user", "-t", arg_t, (char *)NULL);
         perror("Error in execl");
         return (EXIT_FAILURE);
     } else {
