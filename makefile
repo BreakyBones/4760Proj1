@@ -1,24 +1,13 @@
 CC	= gcc -g3
 CFLAGS  = -g3
-TARGET1 = user
-TARGET2 = oss
 
-OBJS1	= oss.c
-OBJS2	= user.c
+all: oss user
 
-all:	$(TARGET1) $(TARGET2)
+oss: oss.c
+	$(CC) $(CFLAGS) -o $@ $<
 
-$(TARGET1):	$(OBJS1)
-	$(CC) -o $(TARGET1) $(OBJS1)
-
-$(TARGET2):	$(OBJS2)
-	$(CC) -o $(TARGET2) $(OBJS2)
-
-user.o:	user.c
-	$(CC) $(CFLAGS) -c user.c 
-
-oss.o:	oss.c
-	$(CC) $(CFLAGS) -c oss.c
+user: user.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	/bin/rm -f *.o $(TARGET1) $(TARGET2)
+	rm -f oss user
