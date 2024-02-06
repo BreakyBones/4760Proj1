@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 
     }
 
-
+    printf("exited fine");
 
     return EXIT_SUCCESS;
 }
