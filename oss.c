@@ -40,8 +40,11 @@ int main(int argc, char** argv) {
                 printf("s command is working: %d\n" , arg_s);
                 break;
             case 't':
-                arg_s = atoi(optarg);
+                arg_t = atoi(optarg);
                 printf("t command is working: %d\n" , arg_t);
+                break;
+            case '?':
+                print_usage(argv[0]);
                 break;
             default: /* '?' */
                 printf("Invalid option %c\n" , optopt);
@@ -51,7 +54,12 @@ int main(int argc, char** argv) {
 
     }
 
-    printf("exited fine");
+    if (arg_n == 0 || arg_s == 0 || arg_t == 0) {
+        printf("All arguments are required\n");
+        print_usage(argv[0]);
+
+        return 1;
+    }
 
     return EXIT_SUCCESS;
 }
