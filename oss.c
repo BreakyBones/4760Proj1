@@ -33,16 +33,20 @@ int main(int argc, char** argv) {
                 return (EXIT_SUCCESS);
             case 'n':
                 arg_n = atoi(optarg);
-                printf("n command is working\n");
+                printf("n command is working: %d\n" , arg_n);
                 break;
             case 's':
                 arg_s = atoi(optarg);
-                printf("s command is working\n");
+                printf("s command is working: %d\n" , arg_s);
                 break;
             case 't':
                 arg_s = atoi(optarg);
-                printf("t command is working\n");
+                printf("t command is working: %d\n" , arg_t);
                 break;
+            default: /* '?' */
+                printf("Invalid option %c\n" , optopt);
+                print_usage(argv[0]);
+                return(EXIT_FAILURE);
         }
 
     }
