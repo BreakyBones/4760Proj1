@@ -54,11 +54,47 @@ int main(int argc, char** argv) {
 
     }
 
-    if (arg_n == 0 || arg_s == 0 || arg_t == 0) {
+    if (arg_n <= 0 || arg_s <= 0 || arg_t <= 0) {
         printf("All arguments are required\n");
         print_usage(argv[0]);
 
         return 1;
+    }
+
+    for (int i = 0; i < arg_n; i++) {
+        if (arg_s > 0 && i % arg_s == 0) { // If the number of processes is equal to the number of active ppid
+            // Wait to launch the next user
+            int status;
+            pid_t cPid = waitpid(-1 &status, 0);
+            if (cPid == -1) {
+                perror("Error in waitpid");
+                return(EXIT_FAILURE);
+            }
+            printf("Child with PID:%d exited successfully\n" , cPid);
+        }
+        pid_t pid = fork();
+
+        if (pid == -1) {
+            perror("Error in forking user process");
+            return(EXIT_FAILURE);
+        }
+
+        if (pid == 0) {
+            // User process launch
+            execl("./user" , "user" , "-t" , arg_t, 0);
+            perror("Error in execl");
+            return(EXIT_FAILURE);
+        }
+        // Wait for the remaining child processes to finish
+        int status;
+        for (int i = 0; i < arg_n % arg_s; ++i) {
+            pid_t cPid = waitpid(-1, &status, 0);
+            if (cPid == -1) {
+                perror("error in waitpid");
+                return(EXIT_FAILURE);
+            }
+        }
+        printf("Child with PID:%d exited successfully\n");
     }
 
     return EXIT_SUCCESS;
