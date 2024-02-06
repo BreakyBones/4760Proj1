@@ -1,24 +1,49 @@
 #include<unistd.h>
 #include<sys/types.h>
-#include<sys/wait.h> // forgot this
+#include<sys/wait.h>
 #include<stdio.h>
 #include<stdlib.h>
+
+void print_usage(const char *progName) {
+    printf("Usage for %s: -n <n_value> -s <s_value> -t <t_value>\n" , progName);
+    printf("Options:\n");
+    printf("-n: stands for the total number of users to launch\n");
+    printf("-s: Defines how many users are allowed to run simultaneously\n");
+    printf("-t: The number that passes to the User Process");
+}
+
+
 int main(int argc, char** argv) {
-    pid_t childPid = fork(); // This is where the child process splits from the parent
-    if (childPid == 0) {
-        printf("I am a user but a copy of oss! My parent's PID is %d, and my PID is %d\n", getppid(), getpid());
-        char* args[] = {"./user", "Hello",
-                        "there", "exec", "is", "neat", 0};
-//execvp(args[0], args);
-        execlp(args[0],args[0],args[1],args[2],args[3],args[4],args[5],args[6] , NULL);
-        fprintf(stderr,"Exec failed, terminating\n");
-        exit(1);
-    } else {
-        printf("I'm a parent! My pid is %d, and my child's pid is %d \n",
-               getpid(), childPid);
-//sleep(1);
-        wait(0);
+const char optstr[] = "hn:s:t:";
+char opt;
+int arg_n = 0;
+int arg_s = 0;
+int arg_t = 0;
+
+    while ( ( opt = getopt(argc , argv,  optstr) ) != -1) {
+
+        switch (opt) {
+            case 'h':
+                print_usage (argv[0]);
+                return (EXIT_SUCCESS);
+            case 'n':
+                arg_n = atoi(optarg);
+                printf("n command is working\n");
+                break;
+            case 's':
+                arg_s = atoi(optarg);
+                printf("s command is working\n");
+                break;
+            case 't':
+                arg_s = atoi(optarg);
+                printf("t command is working\n");
+                break;
+        }
+
     }
-    printf("Parent is now ending.\n");
+
+
+
     return EXIT_SUCCESS;
 }
+
