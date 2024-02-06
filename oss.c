@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     // This is the actual variable for the arguments to use later on
     int arg_n = 0;
     int arg_s = 0;
-    int arg_t = 0;
+    char *arg_t;
 
     // Get your arguments with getopt, save them to their respective variables, they will be used to check if all required variables are filled later
     while ((opt = getopt(argc, argv, optstr)) != -1) {
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
                 printf("s command is working: %d\n", arg_s);
                 break;
             case 't':
-                arg_t = atoi(optarg);
+                arg_t = optarg;
                 printf("t command is working: %d\n", arg_t);
                 break;
             case '?':
@@ -85,9 +85,11 @@ int main(int argc, char **argv) {
         return (EXIT_FAILURE);
     }
 
+
+
     if (pid == 0) {
         // User process launch
-        execl("./user", "user", "-t", arg_t, (char *)NULL);
+        execl("./user",  arg_t, (char *)NULL);
         perror("Error in execl");
         return (EXIT_FAILURE);
     } else {
