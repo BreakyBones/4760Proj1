@@ -94,6 +94,10 @@ int main(int argc, char **argv) {
         }
     }
     // Wait till all users have finished
+    while (activeUser > 0) {
+        wait(0);
+        activeUser--;
+    }
 
     return EXIT_SUCCESS;
 }
