@@ -51,54 +51,49 @@ int main(int argc, char **argv) {
 
     }
 
+    // Check if all argument were provided for use
     if (arg_n <= 0 || arg_s <= 0 || arg_t <= 0) {
         printf("All arguments are required\n");
         print_usage(argv[0]);
 
         return 1;
     }
+    // Keep the iterator low to prevent confusion and time lag on OpSyS server
+    if (atoi(arg_t) > 50) {
+        printf("Please keep your iterator between 0 and 50 to reduce time strain");
 
-    int activeChild = 0;
+        return (EXIT_FAILURE);
+    }
+    // Keep the number of simultaneous processes low to reduce lag on OpSys server
+    if (arg_s > 20) {
+        printf("Please keep the simultaneous number of processes below 20");
+    }
+
+    // Keeps track of all active Users
+    int activeUser = 0;
 
     // Launch User Processes
-    for (int i; i < arg_n; ++i) {
-        if (activeChild >= arg_s) {
-            int status;
-            pid_t childPid = waitpid(-1, &status, WNOHANG);
+    for (int i = 1; i <= arg_n; i++) {
+        // Having a while loop keeps extra users from activating if greater than the limi
+        while (activeUser > arg_s) {
+            wait(0);
+            activeUser--;
+        }
 
-            while (childPid > 0) {
-                printf("Parent process (oss): Child process with PID %d exited with status %d\n" , childPid , WEXITSTATUS(status));
-                activeChild--;
+        // fork the users when not full
+        pid_t childPid  = fork();
 
-                childPid  = waitpid(-1, &status, WNOHANG);
-            }
+        if (childPid == 0) {
+            // An Array of Char to save space in the execvp command
+            char* args[] = {"./user" , arg_t , 0};
+            execvp(args[0] , args); // Begins the process
+        } // Parent continues from here
+        else {
+            // increment active amount of Users
+            activeUser++;
         }
     }
-
-    pid_t pid = fork();
-
-    if (pid == -1) {
-        perror("Error in forking user process");
-        return (EXIT_FAILURE);
-    }
-
-
-
-    if (pid == 0) {
-        // User process launch
-        execl("./user", "user" , arg_t, (char *)NULL);
-        perror("Error in execl");
-        return (EXIT_FAILURE);
-    } else {
-        activeChild++;
-    }
-    // Wait for the remaining child processes to finish
-    int status;
-    pid_t childPid;
-    while ((childPid = waitpid(-1, &status, WNOHANG)) > 0) {
-        printf("Parent process (oss): Child process with PID %d exited with status %d\n", childPid , WEXITSTATUS(status));
-        activeChild--;
-    }
+    // Wait till all users have finished
 
     return EXIT_SUCCESS;
 }
